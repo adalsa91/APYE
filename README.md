@@ -10,5 +10,4 @@ La aplicación consiste en un gestor de ficheros que junto a un editor de texto 
   - Tecnología de virtualización de contenedores (e.g. Docker)
   - IaaS(e.g. Azure  )
 
-
 >Adrián Álvarez Sáez
