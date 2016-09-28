@@ -2,6 +2,7 @@
 ##Prerrequisitos
 - [x] Rellenar la hoja de cálculo correspondiente la equivalencia entre nombre real y nick en GitHub.
 - [x] Cumplimentar los objetivos de la primera sesión.
+
 ## Configurar entorno
 ### 1. Clave ssh
 Generamos el par de claves:
@@ -10,7 +11,7 @@ Generamos el par de claves:
 
 Añadimos la clave pública creada a nuestra cuenta de GitHub:
 
-![Clave ssh GitHub](https://github.com/adalsa91/PracticasIV/blob/hito0/images/practica0/image1.png)
+![Clave ssh GitHub](https://github.com/adalsa91/APYE/blob/hito0/images/image1.png)
 
 ### 2. Parámetros de Git
 Introducimos el nombre y correo electrónico que se mostrará en los commits.
@@ -22,17 +23,17 @@ También configuramos el editor por defetco:
 
     $ git config --global core.editor emacs
 
-![Configuración de Git](https://github.com/adalsa91/PracticasIV/blob/hito0/images/practica0/image2.png)
+![Configuración de Git](https://github.com/adalsa91/APYE/blob/hito0/images/image2.png)
 
 ###3. Completar perfil de GitHub
-![Perfil GitHub](https://github.com/adalsa91/PracticasIV/blob/hito0/practica0/image3.png)
+![Perfil GitHub](https://github.com/adalsa91/APYE/blob/hito0/images/image3.png)
 
 
 ## Creación del repositorio del proyecto
 ### 1.Inicializar proyecto
 Al crear el proyecto podemos elegir inicializar el archivo **.gitignore**, el archivo **README** y elegir una licencia.
 
-![Inicialización del respositorio del proyecto](https://github.com/adalsa91/PracticasIV/blob/hito0/practica0/image4.png)
+![Inicialización del respositorio del proyecto](https://github.com/adalsa91/APYE/blob/hito0/images/image4.png)
 
 ### 2. Creación de rama para hito 0
 Creamos una nueva rama para la práctica 0.
@@ -46,6 +47,8 @@ Y subimos la nueva rama al remoto.
 ### 3. Creación de hitos e issues
 A través de la web de GitHub creamos un hito (Milestone) para agrupar las tareas (issues) del hito 0.
 
-![Creación del hito 0](https://github.com/adalsa91/PracticasIV/blob/hito0/practica0/image5.png)
+![Creación del hito 0](https://github.com/adalsa91/APYE/blob/hito0/images/image5.png)
 
 Ahora creamos tareas referentes a ese hito.
+
+![Creación de tareas](https://github.com/adalsa91/APYE/blob/hito0/images/image6.png)
