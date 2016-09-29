@@ -1,0 +1,6 @@
+{
+  "name": "APYE",
+  "tagline": "Proyecto para la asignatura de Infraestructura Virtual 2016-2017",
+  "body": "# APYE\r\n\r\nProyecto para la asignatura de Infraestructura Virtual 2016-2017\r\n\r\n##Descripción\r\nLa aplicación consiste en un gestor de ficheros que junto a un editor de texto permitirá al usuario la creación y edición de scripts de python, quedando estos almacenados permanentemente entre sesiones, posibilitando la opción de ejecutar estos scripts en un entorno virtual y seguro que devolverá los resultados del programa en pantalla.\r\n\r\n##Herramientas\r\n  - Framework de alto nivel (e.g. Django)\r\n  - Tecnología de virtualización de contenedores (e.g. Docker)\r\n  - IaaS(e.g. Azure  )\r\n\r\n\r\n>Adrián Álvarez Sáez\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
