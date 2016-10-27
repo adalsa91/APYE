@@ -8,7 +8,6 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 def hello():
     return "Hello World!"
 
-
 @app.route('/<name>')
 def hello_name(name):
     return "Hola {}!".format(name)
