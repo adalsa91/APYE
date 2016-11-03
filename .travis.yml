@@ -12,8 +12,3 @@ before_script:
 
 script: python test_base.py
 
-env:
-  - APP_SETTINGS=config.TestConfiguration
-  - SECRET_KEY=Sql1D00WTF.
-  - DATABASE_URL="postgresql://postgres:@localhost/APYE_USERS"
-
