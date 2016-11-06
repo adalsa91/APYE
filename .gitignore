@@ -92,3 +92,8 @@ ENV/
 .env
 
 instance/
+
+#Emacs
+*~
+\#*\#
+.\#*
