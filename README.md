@@ -1,5 +1,7 @@
 # APYE
 
+[![Build Status](https://travis-ci.org/adalsa91/APYE.svg?branch=master)](https://travis-ci.org/adalsa91/APYE)
+
 Proyecto para la asignatura de Infraestructura Virtual 2016-2017
 
 ##Descripción
