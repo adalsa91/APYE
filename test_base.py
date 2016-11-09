@@ -21,7 +21,8 @@ class BaseTestCase(unittest.TestCase):
         db.drop_all()
 
     def test_user(self):
-        usuario = User('adalsa', 'adalsa@correo.ugr.es', 'Adrian')
+        usuario = User('adrian', 'adalsa@correo.ugr.es',
+                       'password', 'Adrian', True)
         db.session.add(usuario)
         db.session.commit()
         usuarios = User.query.all()
