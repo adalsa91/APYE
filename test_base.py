@@ -4,9 +4,10 @@ import os
 import shutil
 from app import app, db
 from models import User
+from flask_login import current_user
 
 
-class BaseTestCase(unittest.TestCase):
+class ApyeTestCase(unittest.TestCase):
     """A base test case for flask-tracking."""
 
     def create_app(self):
@@ -17,6 +18,7 @@ class BaseTestCase(unittest.TestCase):
         db.session.close()
         db.drop_all()
         db.create_all()
+        self.app = app.test_client()
         if not os.path.exists('users/'):
             os.makedirs('users/')
 
@@ -40,8 +42,30 @@ class BaseTestCase(unittest.TestCase):
         f = open('users/adrian/Welcome', 'w+')
         f.write('Welcome!')
         f.seek(0)
-        self.assertEqual(f.read(), 'Welcome!')
+        assert f.read() == 'Welcome!'
         f.close()
         print("[OK] Entorno de usuario creado correctamente\n")
+
+    def test_login_logout(self):
+        usuario = User('jorge', 'jorge@correo.ugr.es',
+                       'password', 'Jorge Nitales', True)
+        db.session.add(usuario)
+        db.session.commit()
+
+        with self.app:
+            # Login
+            response = self.app.post(
+                '/login', data={'username': 'jorge', 'password': 'password'},
+                follow_redirects=True)
+            assert current_user.username == 'jorge'
+            assert b'Success' in response.data
+
+            # Logout
+            response = self.app.post(
+                '/logout', follow_redirects=True)
+            assert current_user.is_anonymous
+
+        print("[OK] Usuarios registrados pueden identificarse correctamente")
+
 if __name__ == '__main__':
     unittest.main()

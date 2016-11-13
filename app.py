@@ -1,6 +1,6 @@
 import os
-import flask_login
-from flask import Flask, render_template, request
+from flask_login import login_user, logout_user, current_user, login_required, LoginManager
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from forms import LoginForm, SignUpForm
 
@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 from models import User
 
 
-login_manager = flask_login.LoginManager()
+login_manager = LoginManager()
 login_manager.init_app(app)
 # This will redirect users to the login view whenever they are required to
 # be logged in.
@@ -47,11 +47,23 @@ def login():
             usuario = db.session.query(User).filter_by(
                 username=str(login_form.username.data)).first()
             if usuario:
-                print('Usuario existe')
                 if login_form.password.data == usuario.password:
-                    print("Success")
+                    login_user(usuario)
+                    usuario.authenticated = True
+                    db.session.commit()
+
+                    # 'next = flask.request.args.get('next')
+                    # next_is_valid should check if the user has valid
+                    # permission to access the `next` url
+                    # if not next_is_valid(next):
+                    #    return flask.abort(400)
+
+                    # return flask.redirect(next or flask.url_for('index'))
+                    return "Success"
+                else:
+                    return "Contraseña incorrecta"
             else:
-                print('Usuario no existe')
+                return "Usuario no existe"
         elif signup_form.validate():
             db.session.add(
                 User(signup_form.username.data, signup_form.email.data,
@@ -61,6 +73,21 @@ def login():
 
     return render_template('login.html', login_form=login_form,
                            signup_form=signup_form)
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    user = User.query.filter_by(username=current_user.username).first()
+    user.authenticated = False
+    db.session.commit()
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    return current_user.username
 
 
 @app.route('/', methods=['GET', 'POST'])
