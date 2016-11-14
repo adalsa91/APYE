@@ -123,6 +123,44 @@ run:
 
 ##Integración Continua
 
-Para este paso usamos el sistema de integración continua Travis, el mótivo de la elección es debido a su popularidad y documentación.
+Para este paso usamos el sistema de integración continua **Travis**, el mótivo de la elección es debido a su popularidad y documentación.
+
+El primer paso es sincronizar *Travis* con nuestro *GitHub*, para ello iniciamos sesión en *Travis* con nuestra cuenta de *GitHub* y activamos el repositorio que queremos conectar en la página de nuestro perfil de *Travis*.
+
+![Activación repositorio en perfil Travis](images/hito2/image2.png "Activación repositorio en perfil Travis")
+
+A continuación creamos el archivo `.travis.yml` en el que especificaremosel lenguaje y versión usados, además de otros datos necesarios para construir el entorno de ejecución y el comando para ejecutar los tests.
+
+```make
+language: python
+python:
+  - "3.4"
+
+install: "pip install -r requirements.txt"
+
+services:
+  postgresql
+
+before_script:
+  - psql -c "create user apye with password 'iDDLpkP1uv' " -U postgres
+  - psql -c "create database apye_users;" -U postgres
+  - psql -c "grant all privileges on database apye_users to apye;" -U postgres
+  - python manage.py db upgrade
+
+script: python test_base.py
 
 
+```
+
+También necesitaremos definir las variables de entorno necsarias para la aplicación, podemos hacerlo en el fichero anterior o en la interfaz web.
+
+![Variables de entorno en Travis](images/hito2/image3.png "Variables de entorno en Travis")
+
+Una vez todo esté configurado hacemos un add --> commit --> push y Travis detectará los cambios en nuestro repositorio de GitHub y lanzará los tests. Podemos comprobar el resultado en la página web de *Travis*.
+![Build History](images/hito2/image4.png "Build History")
+
+![Log Travis](images/hito2/image5.png "Log Travis")
+
+Además Travis nos ofrece un incrustable que demuestra el estado actual del repositorio.
+
+[![Build Status](https://travis-ci.org/adalsa91/APYE.svg?branch=master)](https://travis-ci.org/adalsa91/APYE)
