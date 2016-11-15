@@ -33,6 +33,8 @@
         <h1>
 <a id="apye" class="anchor" href="#apye" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>APYE</h1>
 
+<p><a href="https://travis-ci.org/adalsa91/APYE"><img src="https://travis-ci.org/adalsa91/APYE.svg?branch=master" alt="Build Status"></a></p>
+
 <p>Proyecto para la asignatura de Infraestructura Virtual 2016-2017</p>
 
 <h2>
@@ -44,10 +46,179 @@
 <a id="herramientas" class="anchor" href="#herramientas" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Herramientas</h2>
 
 <ul>
-<li>Framework de alto nivel (e.g. Django)</li>
+<li>Framework Python (e.g. Flask)</li>
 <li>Tecnología de virtualización de contenedores (e.g. Docker)</li>
 <li>IaaS(e.g. Azure  )</li>
 </ul>
+
+<h1>
+<a id="hito-2-integración-continua" class="anchor" href="#hito-2-integraci%C3%B3n-continua" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hito 2: Integración continua</h1>
+
+<h2>
+<a id="requisitos" class="anchor" href="#requisitos" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requisitos</h2>
+
+<p>Para la descripción de las dependencias de la aplciación se ha creado un archivo <em>requeriments.txt</em> que suele ser el nombre usado por convención en Python.</p>
+
+<pre><code>click==6.6
+Flask==0.11.1
+gunicorn==19.6.0
+itsdangerous==0.24
+Jinja2==2.8
+MarkupSafe==0.23
+Werkzeug==0.11.11
+psycopg2==2.6.2
+SQLAlchemy==1.1.2
+Flask-SQLAlchemy==2.1
+Flask-Migrate==2.0.0
+Flask-Testing==0.6.1
+Flask-Login==0.4.0
+Flask-WTF==0.13.1
+WTForms==2.1
+
+</code></pre>
+
+<h2>
+<a id="tests" class="anchor" href="#tests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tests</h2>
+
+<p>Para asegurar el correcto funcionamiento de la aplicación antes de ser desplegada se han escrito los siguientes tests. Para la automatización de los test se ha usado el framework de test <strong>unittest</strong> de Python, que además de orquestar la ejecución de los test proporciona una clase base llamada <em>TestCase</em> que podemos usar para crear nuevos casos de prueba, esta clase incluye métodos como *<em>setUp</em> o <em>tearDown</em> que permiten configurar un entorno funcional para la realización de los test y limpiarlo todo tras las pruebas.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> unittest
+<span class="pl-k">import</span> os
+<span class="pl-k">import</span> shutil
+<span class="pl-k">from</span> app <span class="pl-k">import</span> app, db
+<span class="pl-k">from</span> models <span class="pl-k">import</span> User
+<span class="pl-k">from</span> flask_login <span class="pl-k">import</span> current_user
+
+
+<span class="pl-k">class</span> <span class="pl-en">ApyeTestCase</span>(<span class="pl-e">unittest</span>.<span class="pl-e">TestCase</span>):
+    <span class="pl-s"><span class="pl-pds">"""</span>A base test case for flask-tracking.<span class="pl-pds">"""</span></span>
+
+    <span class="pl-k">def</span> <span class="pl-en">create_app</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        app.config.from_object(<span class="pl-s"><span class="pl-pds">'</span>config.TestConfiguration<span class="pl-pds">'</span></span>)
+        <span class="pl-k">return</span> app
+
+    <span class="pl-k">def</span> <span class="pl-en">setUp</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        db.session.close()
+        db.drop_all()
+        db.create_all()
+        <span class="pl-v">self</span>.app <span class="pl-k">=</span> app.test_client()
+        <span class="pl-k">if</span> <span class="pl-k">not</span> os.path.exists(<span class="pl-s"><span class="pl-pds">'</span>users/<span class="pl-pds">'</span></span>):
+            os.makedirs(<span class="pl-s"><span class="pl-pds">'</span>users/<span class="pl-pds">'</span></span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">tearDown</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        db.session.remove()
+        db.drop_all()
+        shutil.rmtree(<span class="pl-s"><span class="pl-pds">'</span>users<span class="pl-pds">'</span></span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">test_adduser</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        usuario <span class="pl-k">=</span> User(<span class="pl-s"><span class="pl-pds">'</span>adrian<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>adalsa@correo.ugr.es<span class="pl-pds">'</span></span>,
+                       <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Adrian<span class="pl-pds">'</span></span>, <span class="pl-c1">True</span>)
+        db.session.add(usuario)
+        db.session.commit()
+        usuarios <span class="pl-k">=</span> User.query.all()
+        <span class="pl-k">assert</span> usuario <span class="pl-k">in</span> usuarios
+        <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>[OK] Usuario creado satisfactoriamente<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">test_home_user</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        <span class="pl-k">if</span> <span class="pl-k">not</span> os.path.exists(<span class="pl-s"><span class="pl-pds">'</span>users/<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>adrian<span class="pl-pds">'</span></span>):
+            os.makedirs(<span class="pl-s"><span class="pl-pds">'</span>users/<span class="pl-pds">'</span></span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>adrian<span class="pl-pds">'</span></span>)
+        f <span class="pl-k">=</span> <span class="pl-c1">open</span>(<span class="pl-s"><span class="pl-pds">'</span>users/adrian/Welcome<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>w+<span class="pl-pds">'</span></span>)
+        f.write(<span class="pl-s"><span class="pl-pds">'</span>Welcome!<span class="pl-pds">'</span></span>)
+        f.seek(<span class="pl-c1">0</span>)
+        <span class="pl-k">assert</span> f.read() <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>Welcome!<span class="pl-pds">'</span></span>
+        f.close()
+        <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>[OK] Entorno de usuario creado correctamente<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">test_login_logout</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        usuario <span class="pl-k">=</span> User(<span class="pl-s"><span class="pl-pds">'</span>jorge<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>jorge@correo.ugr.es<span class="pl-pds">'</span></span>,
+                       <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>Jorge Nitales<span class="pl-pds">'</span></span>, <span class="pl-c1">True</span>)
+        db.session.add(usuario)
+        db.session.commit()
+
+        <span class="pl-k">with</span> <span class="pl-v">self</span>.app:
+            <span class="pl-c"># Login</span>
+            response <span class="pl-k">=</span> <span class="pl-v">self</span>.app.post(
+                <span class="pl-s"><span class="pl-pds">'</span>/login<span class="pl-pds">'</span></span>, <span class="pl-v">data</span><span class="pl-k">=</span>{<span class="pl-s"><span class="pl-pds">'</span>username<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>jorge<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span>},
+                <span class="pl-v">follow_redirects</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
+            <span class="pl-k">assert</span> current_user.username <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>jorge<span class="pl-pds">'</span></span>
+            <span class="pl-k">assert</span> <span class="pl-s"><span class="pl-k">b</span><span class="pl-pds">'</span>Success<span class="pl-pds">'</span></span> <span class="pl-k">in</span> response.data
+
+            <span class="pl-c"># Logout</span>
+            response <span class="pl-k">=</span> <span class="pl-v">self</span>.app.post(
+                <span class="pl-s"><span class="pl-pds">'</span>/logout<span class="pl-pds">'</span></span>, <span class="pl-v">follow_redirects</span><span class="pl-k">=</span><span class="pl-c1">True</span>)
+            <span class="pl-k">assert</span> current_user.is_anonymous
+
+        <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>[OK] Usuarios registrados pueden identificarse correctamente<span class="pl-pds">"</span></span>)
+
+<span class="pl-k">if</span> <span class="pl-c1">__name__</span> <span class="pl-k">==</span> <span class="pl-s"><span class="pl-pds">'</span>__main__<span class="pl-pds">'</span></span>:
+    unittest.main()
+</pre></div>
+
+<p>Para ejecutar los tests utilizamos la función <strong>discover</strong> de <em>unittest</em>:</p>
+
+<div class="highlight highlight-source-shell"><pre>    python -m unittest discover
+</pre></div>
+
+<p>Este comando busca recursivamente tests desde el directorio en el que lo lanzamos.</p>
+
+<p><img src="https://github.com/adalsa91/APYE/blob/documentacion/images/hito2/image1.png" alt="Resultados tests" title="Resultados tests"></p>
+
+<p>Para simplificar el lanzamiento de tests y otras tareas creamos un <strong>Makefile</strong>:</p>
+
+<div class="highlight highlight-source-makefile"><pre><span class="pl-en">install</span>:
+    pip install -r requirements.txt
+
+<span class="pl-en">test</span>:
+    python -m unittest discover
+
+<span class="pl-en">run</span>:    
+    python manage.py runserver
+</pre></div>
+
+<h2>
+<a id="integración-continua" class="anchor" href="#integraci%C3%B3n-continua" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Integración Continua</h2>
+
+<p>Para este paso usamos el sistema de integración continua <strong>Travis</strong>, el mótivo de la elección es debido a su popularidad y documentación.</p>
+
+<p>El primer paso es sincronizar <em>Travis</em> con nuestro <em>GitHub</em>, para ello iniciamos sesión en <em>Travis</em> con nuestra cuenta de <em>GitHub</em> y activamos el repositorio que queremos conectar en la página de nuestro perfil de <em>Travis</em>.</p>
+
+<p><img src="https://github.com/adalsa91/APYE/blob/documentacion/images/hito2/image2.png" alt="Activación repositorio en perfil Travis" title="Activación repositorio en perfil Travis"></p>
+
+<p>A continuación creamos el archivo <code>.travis.yml</code> en el que especificaremosel lenguaje y versión usados, además de otros datos necesarios para construir el entorno de ejecución y el comando para ejecutar los tests.</p>
+
+<div class="highlight highlight-source-makefile"><pre><span class="pl-en">language</span>: python
+<span class="pl-en">python</span>:
+  - "3.4"
+
+<span class="pl-en">install</span>: "pip install -r requirements.txt"
+
+<span class="pl-en">services</span>:
+  postgresql
+
+<span class="pl-en">before_script</span>:
+  - psql -c "create user apye with password 'iDDLpkP1uv' " -U postgres
+  - psql -c "create database apye_users;" -U postgres
+  - psql -c "grant all privileges on database apye_users to apye;" -U postgres
+  - python manage.py db upgrade
+
+<span class="pl-en">script</span>: python test_base.py
+
+</pre></div>
+
+<p>También necesitaremos definir las variables de entorno necsarias para la aplicación, podemos hacerlo en el fichero anterior o en la interfaz web.</p>
+
+<p><img src="https://github.com/adalsa91/APYE/blob/documentacion/images/hito2/image3.png" alt="Variables de entorno en Travis" title="Variables de entorno en Travis"></p>
+
+<p>Una vez todo esté configurado hacemos un add --&gt; commit --&gt; push y Travis detectará los cambios en nuestro repositorio de GitHub y lanzará los tests. Podemos comprobar el resultado en la página web de <em>Travis</em>.
+<img src="https://github.com/adalsa91/APYE/blob/documentacion/images/hito2/image4.png" alt="Build History" title="Build History"></p>
+
+<p><img src="https://github.com/adalsa91/APYE/blob/documentacion/images/hito2/image5.png" alt="Log Travis" title="Log Travis"></p>
+
+<p>Además Travis nos ofrece un incrustable que demuestra el estado actual del repositorio.</p>
+
+<p><a href="https://travis-ci.org/adalsa91/APYE"><img src="https://travis-ci.org/adalsa91/APYE.svg?branch=master" alt="Build Status"></a></p>
+
+<p><a href="https://adalsa91.github.io/APYE/" title="Página web del proyecto">Página web del proyecto</a></p>
 
 <blockquote>
 <p>Adrián Álvarez Sáez</p>
