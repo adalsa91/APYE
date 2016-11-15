@@ -28,10 +28,18 @@ La aplicación consiste en un gestor de ficheros que junto a un editor de texto 
 
 Es necesario definir tres variables de entorno:
 ```bash
-	export APP_SETTINGS="config.DevelopmentConfig"
-	export DATABASE_URL="postgresql://<user>:<password>@localhost/apye_users"
-	export SECRET_KEY="SuperSecretKey"
+	$ export APP_SETTINGS="config.DevelopmentConfig"
+	$ export DATABASE_URL="postgresql://<user>:<password>@localhost/<db_name>"
+	$ export SECRET_KEY="SuperSecretKey"
 ```
+
+Una vez definidas las variables de entorno podemos ejecutar la aplicación.
+
+```bash
+	$ make run
+```
+
+Si todo ha ido bien se podrá acceder a la aplicación a través de la dirección [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ##Automaticación
 Se han definido algunas reglas en el fichero [Makefile](https://github.com/adalsa91/APYE/blob/master/Makefile) para automatizar algunas tareas:
