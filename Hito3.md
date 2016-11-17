@@ -79,6 +79,35 @@ Podemos comprobar que todo está funcionando correctamente lanzando los tests.
 
 ![Resultado tests Heroku](images/hito3/image8.png "Resultado tests Heroku")
 
-Por último conectamos la aplicación de Heroku con el respositorio de GitHub para activar el despliegue automático, activando la opción de comprobocación de tests para que el despliegue no se realice hasta que Travis CI ejecute los tests con éxito.
+Conectamos la aplicación de Heroku con el respositorio de GitHub para activar el despliegue automático, activando la opción de comprobocación de tests para que el despliegue no se realice hasta que Travis CI ejecute los tests con éxito.
 
 ![Despliegue automático de GitHub a Heroku](images/hito3/image9.png "Despliegue automático de GitHub a Heroku")
+
+Por último añadimos un botón para poder desplegar el repositorio de GitHub automáticamente a Heroku, para ello creamos una fichero `app.json` en la raíz del proyecto con la descripción de la aplicación, enlace al repositorio, addons de Heroku  y variables de entorno necesarios.
+
+```
+{
+  "name": "APYE",
+  "description": "Editor online de Python",
+  "image": "heroku/python",
+  "repository": "https://github.com/adalsa91/APYE",
+  "logo": "https://www.herokucdn.com/deploy/button.svg",
+  "keywords": ["python", "flask" ],
+  "addons": [ "heroku-postgresql" ],
+  "env": {
+      "SECRET_KEY": {
+          "description": "A secret key for verifying the integrity of signed cookies.",
+          "generator": "secret"
+      },
+      "APP_SETTINGS": {
+          "description": "Determine environment.",
+          "value": "config.ProductionConfig"
+      }
+  }
+}
+```
+Con el siguiente fragmento en *Markdown* insertamos el botón.
+```
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+```
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
