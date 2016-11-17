@@ -213,7 +213,109 @@ WTForms==2.1
 
 <p><a href="https://travis-ci.org/adalsa91/APYE"><img src="https://travis-ci.org/adalsa91/APYE.svg?branch=master" alt="Build Status"></a></p>
 
-<p><a href="https://adalsa91.github.io/APYE/" title="Página web del proyecto">Página web del proyecto</a></p>
+<h2>
+<a id="hito-3-despliegue-en-un-paas" class="anchor" href="#hito-3-despliegue-en-un-paas" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hito 3: Despliegue en un Paas</h2>
+
+<p>En primer lugar instalamos <a href="https://devcenter.heroku.com/articles/getting-started-with-python#set-up"><strong>Heroku CLI</strong></a> con el siguiente comando:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ wget -O- https://toolbelt.heroku.com/install-ubuntu.sh <span class="pl-k">|</span> sh</pre></div>
+
+<p>Una vez instalado iniciamos sesión.</p>
+
+<p><img src="https://raw.githubusercontent.com/adalsa91/APYE/documentacion/images/hito3/image1.png" alt="Inicio de sesión en Heroku con CLI" title="Inicio de sesión en Heroku con CLI"></p>
+
+<p>Ahora creamos la aplicación, en mi caso he creado una para producción y otra para pruebas.</p>
+
+<div class="highlight highlight-source-shell"><pre>$ heroku create apye-pro
+$ heroku create apye-stage</pre></div>
+
+<p>Y los añadimos a los remotos.</p>
+
+<div class="highlight highlight-source-shell"><pre>$ git remote add pro git@heroku.com:apye-pro.git
+$ git remote add stage git@heroku.com:apye-stage.git</pre></div>
+
+<p>Creamos un fichero Procfile en la raíz de la aplciación para declarar que comandos deben ser ejecutados al iniciar la aplicación.</p>
+
+<pre><code>web: gunicorn app:app
+
+</code></pre>
+
+<p>También tenemos que especificar la versión de Python que necesita nuestra aplicación, para ello creamos el fichero <code>runtime.txt</code> con el siguiente contenido.</p>
+
+<pre><code>python-3.4.2
+</code></pre>
+
+<p>El resto de dependencias de la aplicación están en el fichero <code>requeriments.txt</code> en la raíz del proyecto y Heroku lo detectará automáticamente.</p>
+
+<p>Debemos definir las variables de entorno, para ello usaremos las herramientas de la CLI.</p>
+
+<div class="highlight highlight-source-shell"><pre>$ heroku config:<span class="pl-c1">set</span> APP_SETTINGS=config.ProductionConfig --remote pro
+$ heroku config:<span class="pl-c1">set</span> SECRET_KEY=SuperSecretKey --remote pro
+$ heroku config:<span class="pl-c1">set</span> APP_SETTINGS=config.ProductionConfig --remote stage
+$ heroku config:<span class="pl-c1">set</span> SECRET_KEY=SuperSecretKey --remote stage</pre></div>
+
+<p>Ya podemos hacer un push a heroku.
+<img src="https://raw.githubusercontent.com/adalsa91/APYE/documentacion/images/hito3/image2.png" alt="Push a Heroku" title="Push a Heroku"></p>
+
+<p>Ahora podemos iniciar la aplicación en local con <code>heroku local</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/adalsa91/APYE/documentacion/images/hito3/image5.png" alt="Heroku local" title="Heroku local"></p>
+
+<div class="highlight highlight-source-shell"><pre>    heroku <span class="pl-k">local</span> web</pre></div>
+
+<p>Antes de poder lanzar la aplicación en remoto tendremos que configurar <em>PostgreSQL</em> en <em>Heroku</em>, para ello añadimos un addon tanto al servidor de stage como al pro.</p>
+
+<div class="highlight highlight-source-shell"><pre>$ heroku addons:create heroku-postgresql:hobby-dev --app apye-stage
+$ heroku addons:create heroku-postgresql:hobby-dev --app apye-pro</pre></div>
+
+<p>Con el comando <code>config</code> del CLI de <em>Heroku</em> podemos comprobar que efectivamente se ha creado la base de datos y la correspondiente variable de entorno.</p>
+
+<p><img src="https://raw.githubusercontent.com/adalsa91/APYE/documentacion/images/hito3/image6.png" alt="Variable de entorno bd Heroku" title="Variable de entorno bd Heroku"></p>
+
+<p>Actualizamos la base de datos con las migraciones.</p>
+
+<div class="highlight highlight-source-shell"><pre>$ heroku run python manage.py db upgrade --app apye-pro
+$ heroku run python manage.py db upgrade --app apye-stage</pre></div>
+
+<p><img src="https://raw.githubusercontent.com/adalsa91/APYE/documentacion/images/hito3/image7.png" alt="Actualización base de datos Heroku" title="Actualización base de datos Heroku"></p>
+
+<p>Podemos comprobar que todo está funcionando correctamente lanzando los tests.</p>
+
+<p><img src="https://raw.githubusercontent.com/adalsa91/APYE/documentacion/images/hito3/image8.png" alt="Resultado tests Heroku" title="Resultado tests Heroku"></p>
+
+<p>Conectamos la aplicación de Heroku con el respositorio de GitHub para activar el despliegue automático, activando la opción de comprobocación de tests para que el despliegue no se realice hasta que Travis CI ejecute los tests con éxito.</p>
+
+<p><img src="images/hito3/image9.png" alt="Despliegue automático de GitHub a Heroku" title="Despliegue automático de GitHub a Heroku"></p>
+
+<p>Por último añadimos un botón para poder desplegar el repositorio de GitHub automáticamente a Heroku, para ello creamos una fichero <code>app.json</code> en la raíz del proyecto con la descripción de la aplicación, enlace al repositorio, addons de Heroku  y variables de entorno necesarios.</p>
+
+<pre><code>{
+  "name": "APYE",
+  "description": "Editor online de Python",
+  "image": "heroku/python",
+  "repository": "https://github.com/adalsa91/APYE",
+  "logo": "https://www.herokucdn.com/deploy/button.svg",
+  "keywords": ["python", "flask" ],
+  "addons": [ "heroku-postgresql" ],
+  "env": {
+      "SECRET_KEY": {
+          "description": "A secret key for verifying the integrity of signed cookies.",
+          "generator": "secret"
+      },
+      "APP_SETTINGS": {
+          "description": "Determine environment.",
+          "value": "config.ProductionConfig"
+      }
+  }
+}
+</code></pre>
+
+<p>Con el siguiente fragmento en <em>Markdown</em> insertamos el botón.</p>
+
+<pre><code>[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+</code></pre>
+
+<p><a href="https://heroku.com/deploy"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"></a></p>
 
 <blockquote>
 <p>Adrián Álvarez Sáez</p>
