@@ -52,7 +52,13 @@ Se han definido algunas reglas en el fichero [Makefile](https://github.com/adals
 ##Integración continua
 Para la integración continua se ha utilizado [Travis CI](https://travis-ci.org/adalsa91/APYE), para más información sobre los tests y el proceso de integración continua consultar la [documentación del proyecto](https://adalsa91.github.io/APYE/).
 
+##Despliegue en un PaaS
+Para el despliegue en un Paas he elegido [Heroku](https://dashboard.heroku.com/), ya que era el PaaS que mejores servicios gratuitos ofrecía, una interfaz web muy intuitiva y fácil de usar además disponía de unas herramientas de CLI muy completas para tareas más complejas, otro motivo de peso es la posibilidad de usar de forma gratuita el addon de PostgreSQL, ya que es el que usa mi aplicación me ahorro externalizar la base de datos. Además ofrece un servicio de *pipelines* que permite crear un flujo de trabajo entre entornos estilo `dev ---> staging ---> production` y por supuesto el soporte a Flask que es el framework que estoy usando para desarrollar la aplicación. Pensando en probar los *pipelines* he creado dos apps: [apye-stage](https://apye-stage.herokuapp.com/) y [apye-pro](https://apye-pro.herokuapp.com/).
 
+**Para más información sobre como se ha realizado el despliegue consultar la [documentación del proyecto](https://adalsa91.github.io/APYE/)**
+
+Si deseas desplegar este proyecto en Heroku utiliza el siguiente botón.
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 [Página web del proyecto](https://adalsa91.github.io/APYE/ "Página web del proyecto")
 
