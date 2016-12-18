@@ -17,4 +17,4 @@ RUN pip3 install -r requirements.txt
 
 #Fijamos el punto de entrada y el comando a ejecutar
 ENTRYPOINT ["python3"]
-CMD ["manage.py","runserver"]
+CMD ["manage.py", "runserver", "--host" , "0.0.0.0"]
