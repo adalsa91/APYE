@@ -9,8 +9,8 @@ services:
 
 before_script:
   - psql -c "create user apye with password 'iDDLpkP1uv' " -U postgres
-  - psql -c "create database apye_users;" -U postgres
-  - psql -c "grant all privileges on database apye_users to apye;" -U postgres
+  - psql -c "create database apye;" -U postgres
+  - psql -c "grant all privileges on database apye to apye;" -U postgres
   - python manage.py db upgrade
 
 script: python test_base.py
