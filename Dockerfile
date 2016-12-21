@@ -17,5 +17,5 @@ RUN pip3 install -r requirements.txt
 EXPOSE 5000
 
 #Fijamos el punto de entrada y el comando a ejecutar
-ENTRYPOINT ["python3"]
-CMD ["manage.py", "runserver", "--host" , "0.0.0.0"]
+ENTRYPOINT ["python3", "manage.py"]
+CMD ["runserver", "--host" , "0.0.0.0"]
