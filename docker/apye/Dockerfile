@@ -14,6 +14,7 @@ RUN git clone https://github.com/adalsa91/APYE.git
 WORKDIR /APYE
 RUN pip3 install -r requirements.txt
 
+EXPOSE 5000
 
 #Fijamos el punto de entrada y el comando a ejecutar
 ENTRYPOINT ["python3"]
