@@ -115,5 +115,4 @@ Para crear las tablas necesarias para la aplicación en la base de datos de Post
     $ python3 migrate.py db upgrade
 ```
 
-
 >Adrián Álvarez Sáez
