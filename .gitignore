@@ -97,3 +97,6 @@ instance/
 *~
 \#*\#
 .\#*
+
+
+.vars.yaml

@@ -1,0 +1,13 @@
+---
+vm_name: apye
+vm_user: apye
+vm_password: SuperSecretPassword
+azure_subscription_id: xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+mgmt_certificate_path: azure_key.pem
+certificate_path: azure_key.cer
+
+db_user: apye
+db_password: SuperSecretPassword
+db_name: apye
+...
