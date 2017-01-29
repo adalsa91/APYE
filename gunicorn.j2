@@ -1,0 +1,16 @@
+description "Gunicorn APYE"
+
+start on (filesystem) or runlevel [2345]
+stop on runlevel [016]
+
+respawn
+setuid apye
+setgid apye
+chdir {{ root_dir }}/{{ project_name }}
+
+env APP_SETTINGS={{ APP_SETTINGS }}
+env DATABASE_URL={{ DATABASE_URL }}
+env SECRET_KEY={{ SECRET_KEY }}
+
+exec /usr/local/bin/gunicorn -b 0.0.0.0:5000 app:app
+

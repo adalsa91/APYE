@@ -1,5 +1,8 @@
 ---
 - hosts: all
+  vars_files:
+    - vars.yaml
+  gather_facts: no
   become: yes
 
   tasks:
@@ -14,6 +17,7 @@
         - python3.4-dev
         - libpq-dev
         - postgresql
+        - gunicorn
 
     - block:
       - name: Download get-pip.py
@@ -21,4 +25,6 @@
 
       - name: Install pip
         command: "python3.4 /tmp/get-pip.py"
-...
+
+    - name: Copy settings file of Gunicorn
+      template: src=gunicorn.j2 dest=/etc/init/gunicorn.conf
