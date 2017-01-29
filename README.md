@@ -108,11 +108,67 @@ La imagen está configurada para arrancar la aplicación automáticamente, para 
 ```bash
     $ docker run --name apye -i --entrypoint /bin/bash --link postgresql_container:postgresql -d -e APP_SETTINGS="config.DevelopmentConfig" -e DATABASE_URL="postgresql://apye:password@postgresql/apye" -e SECRET_KEY="Sql1D00WTF." -p 5000:5000 adalsa91/apye
 ```
-###Creación tablas
+### Creación tablas
 Para crear las tablas necesarias para la aplicación en la base de datos de PostgreSQL debemos ejecutar el siguiente comando en el contenedor de la aplicación:
 
 ```bash
     $ python3 migrate.py db upgrade
 ```
+
+## Despliegue en Azure
+Para realizar el despliegue automático en Azure en primer lugar es necesario instalar la [CLI de Azure](https://docs.microsoft.com/es-es/azure/xplat-cli-install).
+
+```bash
+npm install -g azure-cli
+```
+
+Para realizar el despliegue automático necesitaremos un certificado de gestión para nuestra cuenta de Azure. Para ello hay que seguri los siguientes pasos:
+
+Creamos un par de claves privada/pública en formáto x509 y añadir la pública a nuestra cuenta de azure para poder crear recursos.
+```bash
+$ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ~/.ssh/azurevagrant.key -out ~/.ssh/azurevagrant.key
+$ chmod 600 ~/.ssh/azurevagrant.key
+$ openssl x509 -inform pem -in ~/.ssh/azurevagrant.key -outform der -out ~/.ssh/azurevagrant.cer
+```
+
+Para subir el certificado necesitamos usar el [portal de Azure clásico (ASM)](http://manage.windowsazure.com/), para ello una vez dentro del portal claśico ir a **Settings->Management Certificate->Upload** y seleccionamos la clave pública (con extensión **.cer**).
+
+Una vez creado el certificado clonamos el repositorio.
+
+```bash
+$ git clone https://github.com/adalsa91/APYE.git && cd APYE
+```
+
+Antes de desplegar tendremos que modificar algunas variable en el archivo `vars.yaml`
+
+```yaml
+---
+vm_name: apye
+vm_user: apye
+vm_password: SuperSecretPassword
+azure_subscription_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+mgmt_certificate_path: azure_key.pem
+certificate_path: azure_key.cer
+
+db_user: apye
+db_password: password
+db_name: apye
+....
+```
+
+Principal debemos modificar el id de nuestra subscripción Azure (azure_subscription_id) y los certificados creados anteriormente (mgmt_certificate_path y certificate_path).
+
+Ahora solo debemos ejecutar el siguiente comando para desplegar en Azure:
+
+```bash
+$ vagrant up
+```
+
+
+**Para una descripción más completa de como se ha realizado el despliegue consultar la documentación del [proyecto](https://github.com/adalsa91/APYE/blob/documentacion/Hito5.md).**
+
+**La aplicación se encuentra desplegada en la dirección [http://apye.cloudapp.net/](http://apye.cloudapp.net/)**
+
 
 >Adrián Álvarez Sáez
