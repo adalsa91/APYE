@@ -65,15 +65,22 @@ Para facilitar la modificación de ciertos parámetros relacionados con el depli
 vm_name: apye
 vm_user: apye
 vm_password: SuperSecretPassword
-azure_subscription_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+azure_subscription_id: xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-mgmt_certificate_path: azure_key.pem
-certificate_path: azure_key.cer
+mgmt_certificate_path: azure.pem
 
 db_user: apye
-db_password: password
+db_password: iDDLpkP1uv
 db_name: apye
-....
+
+root_dir: /srv
+project_name: APYE
+project_repo: https://github.com/adalsa91/APYE
+
+APP_SETTINGS: config.ProductionConfig
+DATABASE_URL: postgresql://apye:iDDLpkP1uv@localhost/apye
+SECRET_KEY: SuperSecretPassword
+...
 ```
 
 ### Vagrant
@@ -201,6 +208,7 @@ Para instalarlo usamos el siguiente comando:
         - python3.4-dev
         - libpq-dev
         - postgresql
+        - gunicorn
 
     - block:
       - name: Download get-pip.py
@@ -208,12 +216,75 @@ Para instalarlo usamos el siguiente comando:
 
       - name: Install pip
         command: "python3.4 /tmp/get-pip.py"
+
+      - name: Copy settings file of Gunicorn
+        template: src=gunicorn.j2 dest=/etc/init/gunicorn.conf
 ...
+```
 
 Estas tareas realizan una actualización de los repositorios y de todos los paquetes instalados, además instalan dependencias básicas del servicio como: Python3.4, PostgreSQL, pip...
+
+También copia un fichero de configuración para crear un trabajo para **UpStart** para arrancar automáticamente el servidor Gunicorn, el fichero de configuración se rellena con algunas de las variables definidas en el archivo `vars.yaml` usando el motor de templates Jinja2.
+
+```
+description "Gunicorn APYE"
+
+start on (filesystem) or runlevel [2345]
+stop on runlevel [016]
+
+respawn
+setuid apye
+setgid apye
+chdir {{ root_dir }}/{{ project_name }}
+
+env APP_SETTINGS={{ APP_SETTINGS }}
+env DATABASE_URL={{ DATABASE_URL }}
+env SECRET_KEY={{ SECRET_KEY }}
+
+exec /usr/local/bin/gunicorn -b 0.0.0.0:5000 app:app
 ```
 
 ### Fabric
 Para automatizar el despliegue y ejecución de la aplicación se utilizará la herramienta **Fabric**.
 
-![Under construction](images/hito5/image1.png "Under construction")
+Para ello definimos algunas funciones en el fichero `fabfile.py`.
+
+```python
+import os
+import yaml
+from fabric.contrib.files import exists
+from fabric.api import *
+
+env.key_filename = 'azure.rsa'
+env.user = 'apye'
+env.hosts = ['apye.cloudapp.net']
+
+with open('vars.yaml', 'r') as f:
+    env.vars = yaml.load(f)
+
+project_root = env.vars['root_dir'] + '/' + env.vars['project_name']
+
+def get_repo():
+
+    if exists(project_root + '/' + '.git'):
+        run('cd {} && git pull origin master'.format(project_root))
+    else:
+        run('git clone {} {}'.format(env.vars['project_repo'], project_root))
+
+def deploy():
+    sudo('mkdir -p {}'.format(project_root))
+    sudo('chown -R {}:{} {}'.format(env.vars['vm_user'], env.vars['vm_user'], project_root))
+    with cd(project_root):
+        get_repo()
+        sudo('make install')
+        sudo('service gunicorn restart')
+```
+Con la función deploy conseguimos descargar o actualizar el código fuente de la aplicación desde el repositorio de GitHub, instalar las dependencias de la aplicación y arrancar Gunicorn sirviendo la aplicación.
+
+Para ejecutar el despliegue ejecutamos el siguiente comando:
+
+```bash
+    $ fab deploy
+```
+
+Una vez desplegada la aplicación podemos comprobar que todo funciona correctamente accediendo a la página [apye.cloudapp.net](apye.cloudapp.net)
