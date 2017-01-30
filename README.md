@@ -159,12 +159,36 @@ db_name: apye
 
 Principal debemos modificar el id de nuestra subscripción Azure (azure_subscription_id) y los certificados creados anteriormente (mgmt_certificate_path y certificate_path).
 
-Ahora solo debemos ejecutar el siguiente comando para desplegar en Azure:
+Ejecutamos el siguiente comando para desplegar en Azure:
 
 ```bash
 $ vagrant up
 ```
 
+Y por último desplegamos la aplicación con el siguiente comando:
+
+```
+$ fab deploy
+```
+
+De forma alternativa a estos dos últimos comandos podemos ejecutar el siguiente comando:
+
+```bash
+    # make deploy-azure
+```
+
+Que antes de realizar el despliegue instalará todos los paquetes necesarios para realizar el despliegue. Las acciones que ejecuta la regla `deploy-azure` son las siguientes:
+
+```bash
+deploy-azure:
+        sudo apt-get update
+        FILE=`mktemp`; wget https://releases.hashicorp.com/vagrant/1.8.7/vagrant_1.8.7_x86_64.deb -qO $FILE && sudo dpkg -i $FILE; rm $FILE
+        vagrant plugin install vagrant-azure
+        FILE=`mktemp`; wget https://bootstrap.pypa.io/get-pip.py -q0 $FILE && sudo python get-pip.py; rm $FILE
+        sudo pip install ansible fabric
+        vagrant up
+        fab deploy
+```
 
 **Para una descripción más completa de como se ha realizado el despliegue consultar la documentación del [proyecto](https://github.com/adalsa91/APYE/blob/documentacion/Hito5.md).**
 
